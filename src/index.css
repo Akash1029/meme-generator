@@ -1,4 +1,4 @@
-/* * {
+ * {
   box-sizing: border-box;
 }
 
@@ -64,7 +64,7 @@ main {
   max-width: 100%;
 }
 
-/* p {
+ p {
   padding: 20px;
   background: #fff;
   color: #000;
@@ -124,14 +124,14 @@ p.dark {
 
 .hidden{
   display: none;
-} */
+} 
 
-body {
+/* body {
   background-color: ivory;
-}
+} */
 #canvas {
   border:1px solid red;
 }
 #theText {
-  width:10em;
+  width:40px;
 }
