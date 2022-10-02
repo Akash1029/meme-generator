@@ -15,7 +15,6 @@ function Canvas() {
     offsetY = canvas.current.offsetTop;
     scrollX = canvas.current.scrollLeft;
     scrollY = canvas.current.scrollTop;
-    draw();
   })
 
   const data = [
@@ -28,31 +27,30 @@ function Canvas() {
   let selectedText = -1;
   const [state, setState] = useState(data);
 
-  console.log(state);
+  // console.log(state);
   // var texts = state.texts;
   // clear the canvas & redraw all texts
-  function draw() {
-      texts = state;
+  function draw(state) {
       const ctx = canvas.current.getContext("2d");  
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.clearRect(0, 0, canvas.current.width, canvas.current.height);
       for (var i = 0; i < state.length; i++) {
           var text = state[i];
+          // debugger
           ctx.fillText(text.text, text.x, text.y);
       }
     }
 
     function textHittest(x, y, textIndex) {
+      var text = state[textIndex];
       // debugger;
-        var text = state[textIndex];
-        // return (x >= text.x && x <= text.x + text.width && y >= text.y - text.height && y <= text.y);
-        return (x >= text.x && x <= text.x + text.width && y >= text.y - text.height);
+      return (x >= text.x && x <= text.x + text.width && y >= text.y - text.height && y <= text.y);
+      // return (x >= text.x && x <= text.x + text.width && y >= text.y - text.height);
     }
   
     function handleMouseDown(e) {
       e.preventDefault();
       startX = parseInt(e.clientX - offsetX);
       startY = parseInt(e.clientY - offsetY);
-      console.log(state.length);
       // debugger
       for (var i = 0; i < state.length; i++) {
         // console.log(textHittest(startX, startY, i));
@@ -74,27 +72,45 @@ function Canvas() {
     var dy = mouseY - startY;
     startX = mouseX;
     startY = mouseY;
-    var text = state[1];
-    debugger;
-    console.log(dx, dy);
+    var text = state[selectedText];
+
+    // debugger
+
     setState(prevState => {
       const newState = prevState.map(drag_text =>{
-        
-        // if (drag_text == text) {
+        if (drag_text.id === text.id) {
+          
+          const xx = drag_text.x + dx;
+          const yy = drag_text.y + dy;
+          // debugger
           return {
             ...drag_text,
-            x: mouseX,
-            y: mouseY
+            x: xx,
+            y: yy
           };
-        // }
+        }
+        return drag_text;
       }) 
+      texts = newState;
+      draw(texts);
       return newState;
     });
-    draw();
-
   };
 
+  function handleMouseUp(e) {
+    e.preventDefault();
+    selectedText = -1;
+  }
 
+  function handleMouseOut(e) {
+    e.preventDefault();
+    selectedText = -1;
+  }
+
+  useEffect(() => {
+    texts = state;
+    draw(texts);
+  }, [draw]);
 
 
 
@@ -105,7 +121,18 @@ function Canvas() {
           ? "The mouse is at x: " + state.x + ", y: " + state.y
           : "Move the mouse over this box"}
       </div> */}
-      <canvas id="canvas" ref={canvas} width={300} height={300} onMouseMove={handleMouseMove} onMouseDown={handleMouseDown}/>
+      <canvas 
+        id="canvas" 
+        ref={canvas} 
+        width={window.innerWidth}
+        height={window.innerHeight} 
+        onMouseDown={handleMouseDown} 
+        onMouseMove={handleMouseMove} 
+        onMouseUp = {handleMouseUp} 
+        onMouseOut={handleMouseOut}
+      >
+        Canvas
+      </canvas>
     </main>
   );
 }

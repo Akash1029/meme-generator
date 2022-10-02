@@ -129,9 +129,13 @@ p.dark {
 /* body {
   background-color: ivory;
 } */
-#canvas {
+canvas {
   border:1px solid red;
 }
 #theText {
   width:40px;
+}
+
+.radio-buttons {
+  z-index: 10;
 }
