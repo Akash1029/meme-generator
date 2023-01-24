@@ -236,7 +236,7 @@ const DynamicCanvas = () => {
         .measureText(options.text).width;
     const textHeight = 24;
     elementsCopy[id] = {
-        ...createElement(id, x1, y1-66, x1 + textWidth, y1 + textHeight, type),
+        ...createElement(id, x1, y1, x1 + textWidth, y1 + textHeight, type),
         text: options.text,
     };
 
@@ -307,7 +307,7 @@ const DynamicCanvas = () => {
         const width = x2 - x1;
         const height = y2 - y1;
         const newX1 = clientX - offsetX;
-        const newY1 = clientY - offsetY + 60;
+        const newY1 = clientY - offsetY;
         const options = type === "text" ? { text: selectedElement.text } : {};
         updateElement(id, newX1, newY1, newX1 + width, newY1 + height, type, options);
       }
