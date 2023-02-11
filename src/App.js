@@ -13,10 +13,10 @@ function App() {
   return (
     <div className="App">
       {/* <Header /> */}
-      {/* <Canvas /> */}
+      <Canvas />
       {/* <Meme /> */}
       {/* <Excalidraw /> */}
-      <DynamicCanvas />
+      {/* <DynamicCanvas /> */}
     </div>
     
   );

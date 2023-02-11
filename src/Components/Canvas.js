@@ -1,121 +1,131 @@
-import React, {useState, useEffect, useRef} from "react";
-import ReactDOM from "react-dom";
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable no-unused-vars */
+import React, {useState, useRef, useEffect} from "react";
 
-function Canvas() {
+function Canvas(){
+
   const canvas = useRef();
+  const inputRef = useRef();
+  let ctx = null;
   let offsetX;
   let offsetY;
   let scrollX;
   let scrollY;
   let mouseX;
   let mouseY;
-  var texts;
-  useEffect(() =>{
-    offsetX = canvas.current.offsetLeft;
-    offsetY = canvas.current.offsetTop;
-    scrollX = canvas.current.scrollLeft;
-    scrollY = canvas.current.scrollTop;
-  })
+  let dragTarget = null;
 
-  const data = [
-    {id: 1, text: 'Austria', height: 200, width: 200, x: 200, y: 200},
-    {id: 2, text: 'Belgium', height: 200, width: 200, x: 100, y: 100},
-    {id: 3, text: 'Canada', height: 200, width: 200, x: 50, y: 50},
-  ];
+  // const data = [
+  //   {id: 1, text: 'Austria', h: 20, w: 30, x: 200, y: 200}
+  // ];
+  const [data, setData] = useState([]);
+
+
+  useEffect(() => {
+    const canvasEle = canvas.current;
+    canvasEle.width = canvasEle.clientWidth;
+    canvasEle.height = canvasEle.clientHeight;
+    offsetX = canvasEle.offsetLeft;
+    offsetY = canvasEle.offsetTop;
+    scrollX = canvasEle.scrollLeft;
+    scrollY = canvasEle.scrollTop;
+
+    // get context of the canvas
+    ctx = canvasEle.getContext("2d");
+  });
+
   let startX;
   let startY;
-  let selectedText = -1;
-  const [state, setState] = useState(data);
+  let isDown = false;
 
-  // console.log(state);
-  // var texts = state.texts;
-  // clear the canvas & redraw all texts
-  function draw(state) {
-      const ctx = canvas.current.getContext("2d");  
-      ctx.clearRect(0, 0, canvas.current.width, canvas.current.height);
-      for (var i = 0; i < state.length; i++) {
-          var text = state[i];
-          // debugger
-          ctx.fillText(text.text, text.x, text.y);
+  function draw() {
+    const ctx = canvas.current.getContext("2d");  
+    ctx.clearRect(0, 0, canvas.current.width, canvas.current.height);
+    for (var i = 0; i < data.length; i++) {
+        var text = data[i];
+        // debugger
+        ctx.font = '16px serif';
+        ctx.fillText(text.text, text.x, text.y);
+
+    }
+  }
+  function textHit(x, y, textIndex) {
+    let isTarget = null;
+    for (let i = 0; i < data.length; i++) {
+      const text = data[i];
+      if (x >= text.x && x <= text.x + text.w && y >= text.y - text.h && y <= text.y) {
+        dragTarget = text;
+        isTarget = true;
+        break;
       }
     }
+    return isTarget;
+  }
 
-    function textHittest(x, y, textIndex) {
-      var text = state[textIndex];
-      // debugger;
-      return (x >= text.x && x <= text.x + text.width && y >= text.y - text.height && y <= text.y);
-      // return (x >= text.x && x <= text.x + text.width && y >= text.y - text.height);
-    }
-  
-    function handleMouseDown(e) {
-      e.preventDefault();
-      startX = parseInt(e.clientX - offsetX);
-      startY = parseInt(e.clientY - offsetY);
-      // debugger
-      for (var i = 0; i < state.length; i++) {
-        // console.log(textHittest(startX, startY, i));
-        if (textHittest(startX, startY, i)) {
-          selectedText = i;
-        }
-      }
-    }
+  function handleMouseDown(e) {
+    e.preventDefault();
+    startX = parseInt(e.nativeEvent.offsetX - canvas.current.clientLeft);
+    startY = parseInt(e.nativeEvent.offsetY - canvas.current.clientTop);
+    isDown = textHit(startX, startY);
+  }
 
   function handleMouseMove(e){
-    // console.log(selectedText);
-    if (selectedText < 0) {
+    if (!isDown) {
       return;
     }
     e.preventDefault();
-    mouseX = parseInt(e.clientX - offsetX);
-    mouseY = parseInt(e.clientY - offsetY);
-    var dx = mouseX - startX;
-    var dy = mouseY - startY;
+    const mouseX = parseInt(e.nativeEvent.offsetX - canvas.current.clientLeft);
+    const mouseY = parseInt(e.nativeEvent.offsetY - canvas.current.clientTop);
+    const dx = mouseX - startX;
+    const dy = mouseY - startY;
     startX = mouseX;
     startY = mouseY;
-    var text = state[selectedText];
-
-    // debugger
-
-    setState(prevState => {
-      const newState = prevState.map(drag_text =>{
-        if (drag_text.id === text.id) {
-          
-          const xx = drag_text.x + dx;
-          const yy = drag_text.y + dy;
-          // debugger
-          return {
-            ...drag_text,
-            x: xx,
-            y: yy
-          };
-        }
-        return drag_text;
-      }) 
-      texts = newState;
-      draw(texts);
-      return newState;
-    });
+    if(dragTarget.y >15){
+      dragTarget.y += dy;
+    }
+    if(dragTarget.x > 15){
+      dragTarget.x += dx;
+    }
+    draw();
   };
 
-  function handleMouseUp(e) {
-    e.preventDefault();
-    selectedText = -1;
+  const handleMouseUp = e => {
+    dragTarget = null;
+    isDown = false;
+  }
+  const handleMouseOut = e => {
+    handleMouseUp(e);
   }
 
-  function handleMouseOut(e) {
+  function addText(e) {
     e.preventDefault();
-    selectedText = -1;
+    const newData = {text: inputRef.current.value, h: 20, w: 30, x: 200, y: 200};
+    
+    setData(prevData => [...prevData, newData])
+    // setMyArray(oldArray => [...oldArray, newElement]);
+    // draw();
+
+    inputRef.current.value = null;
   }
 
   useEffect(() => {
-    texts = state;
-    draw(texts);
-  }, [draw]);
-
-
-
+    draw(data);
+  });
   return (
     <main>
+       <div className="form">
+          <input 
+              type="text"
+              placeholder="Add text"
+              className="form--input top"
+              name="newText"
+              ref={inputRef}
+          />
+          <button 
+              className="form--button"
+              onClick={addText}
+          >Add Text</button>  
+        </div>
       {/* <div>
         {state.x || state.y
           ? "The mouse is at x: " + state.x + ", y: " + state.y
@@ -135,6 +145,7 @@ function Canvas() {
       </canvas>
     </main>
   );
+
 }
 
 export default Canvas;
