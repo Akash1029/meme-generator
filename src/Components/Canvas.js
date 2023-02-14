@@ -82,9 +82,14 @@ function Canvas(){
     startY = mouseY;
     if(dragTarget.y >15){
       dragTarget.y += dy;
+    }else {
+      dragTarget.y += 16;
     }
     if(dragTarget.x > 15){
       dragTarget.x += dx;
+    }else {
+      dragTarget.x += 16;
+
     }
     draw();
   };
