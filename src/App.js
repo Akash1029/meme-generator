@@ -13,8 +13,8 @@ function App() {
   return (
     <div className="App">
       {/* <Header /> */}
-      <Canvas />
-      {/* <Meme /> */}
+      {/* <Canvas /> */}
+      <Meme />
       {/* <Excalidraw /> */}
       {/* <DynamicCanvas /> */}
     </div>
@@ -23,4 +23,3 @@ function App() {
 }
 
 export default App;
-  
